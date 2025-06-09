@@ -35,11 +35,27 @@
             .container {
                 display: grid;
                 grid-template-areas:
-                    ". top ."
-                    "left naka right"
-                    ". bottom .";
+                    "darkmode  top    playercount"
+                    "left      naka   right"
+                    "gametype bottom languageswitch";
                 grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr);
                 grid-template-rows: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr);
+            }
+
+            #darkmode {
+                grid-area: darkmode;
+            }
+
+            #playercount {
+                grid-area: playercount;
+            }
+
+            #gametype {
+                grid-area: gametype;
+            }
+
+            #languageswitch {
+                grid-area: languageswitch;
             }
 
             .container > .bottom {
@@ -85,17 +101,24 @@
                 font-weight: bold;
             }
 
-            #roundwind {
-                color: #00A;
-            }
-
             #honbacount {
                 margin: 0;
                 font-size: 8vmin;
             }
 
+            /* Color info */
+            #roundwind {
+                color: #00A;
+            }
+
             #ton {
                 color: #A00;
+            }
+
+            .option {
+                border-width: 0;
+                background: #FFF;
+                color: #AAA;
             }
         </style>
     </head>
@@ -103,6 +126,7 @@
     <body>
         <!-- HTML -->
         <div class="container">
+            <!-- Seats -->
             <div id="ton" class="seat">
                 <p class="seatwind">東</p>
             </div>
@@ -120,46 +144,125 @@
             </div>
 
 
+            <!-- Information -->
             <div id="naka">
                 <p id="roundinfo">
                     <span id="roundwind"></span><span id="roundcount"></span>
                 </p>
                 <p id="honbacount"></p>
             </div>
+
+            <!-- Options -->
+            <button id="darkmode" class="option"></button>
+
+            <button id="languageswitch" class="option"></button>
+
+            <button id="playercount" class="option"></button>
+
+            <button id="gametype" class="option"></button>
         </div>
 
         <!-- Javascript -->
         <script>
             // Constants
-            const WIND_TON  = 0;
-            const WIND_NAN  = 1;
-            const WIND_SHAA = 2;
-            const WIND_PEI  = 3;
-            const WINDS     = ["東", "南", "西", "北"];
-            const POSITIONS = ["bottom", "right", "top", "left"];   // CSS class
 
-            const TON_ELEMENT  = document.getElementById("ton");
-            const NAN_ELEMENT  = document.getElementById("nan");
-            const SHAA_ELEMENT = document.getElementById("shaa");
-            const PEI_ELEMENT  = document.getElementById("pei");
-            const WIND_DISPLAY = document.getElementById("roundwind");
-            const ROUND_INFO   = document.getElementById("roundinfo");
-            const ROUND_DISPLAY= document.getElementById("roundcount");
-            const HONBA_DISPLAY= document.getElementById("honbacount");
+            const WIND_TON        = 0;  // TODO: look into replacing this with an enum
+            const WIND_NAN        = 1;
+            const WIND_SHAA       = 2;
+            const WIND_PEI        = 3;
+            const WINDS           = ["東", "南", "西", "北"]; // TODO: replace with a language-switcher friendly version
+            const POSITIONS       = ["bottom", "right", "top", "left"];   // CSS classes
+            const PLAYER_DEFAULT  = 4;
+            const PLAYER_SANMA    = 3;
+            const ROUND_TONPUUSEN = 1;
+            const ROUND_HANCHAN   = 2;
+            const ROUND_IICHAN    = 4;
+
+            const TON_ELEMENT     = document.getElementById("ton");
+            const NAN_ELEMENT     = document.getElementById("nan");
+            const SHAA_ELEMENT    = document.getElementById("shaa");
+            const PEI_ELEMENT     = document.getElementById("pei");
+            const WIND_DISPLAY    = document.getElementById("roundwind");
+            const ROUND_INFO      = document.getElementById("roundinfo");
+            const ROUND_DISPLAY   = document.getElementById("roundcount");
+            const HONBA_DISPLAY   = document.getElementById("honbacount");
+            const DARKMODE_BTN    = document.getElementById("darkmode");
+            const LANGUAGE_BTN    = document.getElementById("languageswitch");
+            const PLAYERC_BTN     = document.getElementById("playercount");
+            const GAMET_BTN       = document.getElementById("gametype");
+
 
             // State
-            let round = 0;          // AUto-flows to 1 at first nextRound()
-            let wind = WIND_PEI;    // Auto-flows to TON at first nextWind()
+
+            let darkMode = false;
+            let language = "en";    // TODO: should default be JP?
+            let players = 4;
+            let maxRounds = 2;      // Hanchan by default
+
+            let round = 0;          // Auto-flows to 1 at first nextRound()     TODO: addition of a reset() will remove this 
+            let wind = WIND_PEI;    // Auto-flows to TON at first nextWind()    TODO: addition of a reset() will remove this
             let honba = 0;
 
-            function updateDisplay() {
-                WIND_DISPLAY.innerText  = `${WINDS[wind]}`;
-                ROUND_DISPLAY.innerText = `${round}局`;
-                HONBA_DISPLAY.innerText = `${honba}本場`;
+
+            // Utility functions
+
+            function isStart() {
+                return round === 0 && wind === WIND_TON && honba === 0;
             }
 
+            function reset() {
+                round = 0;
+                wind = WIND_PEI;
+                honba = 0;
+
+                updateDisplay();
+            }
+
+            
+            // Display functions
+
+            function updateDisplay() {
+                // Naka 
+                WIND_DISPLAY.innerText  = `${WINDS[wind]}`;     // TODO: replace WINDS with a language-switch friendly alternative
+                ROUND_DISPLAY.innerText = `${round}局`;         // TODO: replace kyoku with a language-switch friendly alternative
+                HONBA_DISPLAY.innerText = `${honba}本場`;       // TODO: replace honba with a language-switch friendly alternative
+
+                // Options                                      // TODO: replace all of these options with a language-switch friendly alternative
+                if (darkMode)           // Dark mode button
+                    DARKMODE_BTN.innerHtml = `L/<span style="color:#FAF">D</span>`;
+                else 
+                    DARKMODE_BTN.innerHtml = `<span style="color:#FAF">L</span>/D`;
+
+
+                if (isStart())          // Player count button
+                    if (players == 4)
+                        PLAYERC_BTN.innerHtml = `3/<span style="color:#FAF">4</span>`; 
+                    else 
+                        PLAYERC_BTN.innerHtml = `<span style="color:#FAF">3</span>/4`;
+                else 
+                    PLAYERC_BTN.innerHtml = "R";
+
+
+                if (isStart())          // Player count button
+                    if (maxRounds === 1)    // Gametype button
+                        GAMET_BTN.innerHtml = `<span style="color:#FAF">東</span>/半/一`
+                    else if (maxRounds === 2)
+                        GAMET_BTN.innerHtml = `東/<span style="color:#FAF">半</span>/一`
+                    else
+                        GAMET_BTN.innerHtml = `東/半/<span style="color:#FAF">一</span>`
+                else 
+                    PLAYERC_BTN.innerHtml = "R";
+            }
+
+            function toggleDarkMode() {
+                // TODO
+            }
+
+
+            // Round control functions
+
             function nextWind() {
-                wind = (wind + 1) % 4;      // Capping value between TON and PEI
+                wind = (wind + 1) % maxRounds;      // Capping value to setting
 
 
                 // Reset state (round and honba)
@@ -168,9 +271,10 @@
                 // Call from nextRound should update display 
             }
 
+
             function nextRound() {
                 // Rotate css positions array
-                let pos = POSITIONS.slice();
+                let pos = POSITIONS.slice();            // Rotating a copy
                 
                 for (let i=0; i<round; i++)
                     pos.push(pos.splice(0, 1)[0]);
@@ -200,20 +304,32 @@
                 updateDisplay();
             }
 
+
             function nextHonba() {
                 honba++;                                // Increment counter
                 updateDisplay();
             }
 
+
+
             // Main
+
             window.onload = () => {
-                nextRound();
-                nextWind();
+                // Cycling into correct information
+                nextRound();                            // TODO: Replace with a reset() command
+                nextWind();                             // TODO: see above
                 updateDisplay();
+
+                // Bindings
+                ROUND_INFO.addEventListener("click", nextRound);
+                HONBA_DISPLAY.addEventListener("click", nextHonba);
+
+                DARKMODE_BTN.addEventListener("click", nextHonba); // TODO
+                LANGUAGE_BTN.addEventListener("click", nextHonba);
+                PLAYERC_BTN.addEventListener("click", nextHonba);
+                GAMET_BTN.addEventListener("click", nextHonba);
             }
 
-            ROUND_INFO.addEventListener("click", nextRound);
-            HONBA_DISPLAY.addEventListener("click", nextHonba);
         </script>
     </body>
 </html
