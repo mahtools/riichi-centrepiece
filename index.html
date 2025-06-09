@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Riichi Centrepiece</title>
+
+        <!-- CSS -->
+        <style>
+            /* Responsive font and global styles */
+            * {
+                font-family: serif;
+                font-size: 10vmin;
+            }
+
+            html, body {
+                height: 100%;
+            }
+
+            html {
+                display: table;
+                margin: auto;
+            }
+
+            body {
+                display: table-cell;
+                vertical-align: middle;
+            }
+
+            p {
+                -webkit-user-select: none; /* Safari */
+                -ms-user-select: none; /* IE 10 and IE 11 */
+                user-select: none; /* Standard syntax */
+            }
+
+            /* Layout information */
+            .container {
+                display: grid;
+                grid-template-areas:
+                    ". top ."
+                    "left naka right"
+                    ". bottom .";
+                grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr);
+                grid-template-rows: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr);
+            }
+
+            .container > .bottom {
+                grid-area: bottom;
+                transform: rotate(0deg);
+            }
+            .container > .right {
+                grid-area: right;
+                transform: rotate(270deg);
+            }
+            .container > .top {
+                grid-area: top;
+                transform: rotate(180deg);
+            }
+            .container > .left {
+                grid-area: left;
+                transform: rotate(90deg);
+            }
+
+            .container > #naka {
+                grid-area: naka;
+            }
+
+            .seat {
+                justify-self: center;
+                align-self: center;
+            }
+
+            .seat p {
+                font-weight: bold;
+                font-size: 20vmin;
+                margin: 0;
+            }
+
+            #naka {
+                justify-self: center;
+                align-self: center;
+                text-align: center;
+            }
+
+            #roundinfo {
+                margin: 0;
+                font-weight: bold;
+            }
+
+            #roundwind {
+                color: #00A;
+            }
+
+            #honbacount {
+                margin: 0;
+                font-size: 8vmin;
+            }
+
+            #ton {
+                color: #A00;
+            }
+        </style>
+    </head>
+
+    <body>
+        <!-- HTML -->
+        <div class="container">
+            <div id="ton" class="seat">
+                <p class="seatwind">東</p>
+            </div>
+
+            <div id="nan" class="seat">
+                <p class="seatwind">南</p>
+            </div>
+
+            <div id="shaa" class="seat">
+                <p class="seatwind">西</p>
+            </div>
+
+            <div id="pei" class="seat">
+                <p class="seatwind">北</p>
+            </div>
+
+
+            <div id="naka">
+                <p id="roundinfo">
+                    <span id="roundwind"></span><span id="roundcount"></span>
+                </p>
+                <p id="honbacount"></p>
+            </div>
+        </div>
+
+        <!-- Javascript -->
+        <script>
+            // Constants
+            const WIND_TON  = 0;
+            const WIND_NAN  = 1;
+            const WIND_SHAA = 2;
+            const WIND_PEI  = 3;
+            const WINDS     = ["東", "南", "西", "北"];
+            const POSITIONS = ["bottom", "right", "top", "left"];   // CSS class
+
+            const TON_ELEMENT  = document.getElementById("ton");
+            const NAN_ELEMENT  = document.getElementById("nan");
+            const SHAA_ELEMENT = document.getElementById("shaa");
+            const PEI_ELEMENT  = document.getElementById("pei");
+            const WIND_DISPLAY = document.getElementById("roundwind");
+            const ROUND_INFO   = document.getElementById("roundinfo");
+            const ROUND_DISPLAY= document.getElementById("roundcount");
+            const HONBA_DISPLAY= document.getElementById("honbacount");
+
+            // State
+            let round = 1;
+            let wind = WIND_PEI;    // Auto-flows to TON at first nextWind()
+            let honba = 0;
+
+            function updateDisplay() {
+                WIND_DISPLAY.innerText  = `${WINDS[wind]}`;
+                ROUND_DISPLAY.innerText = `${round}局`;
+                HONBA_DISPLAY.innerText = `${honba}本場`;
+            }
+
+            function nextWind() {
+                wind = (wind + 1) % 4;      // Capping value between TON and PEI
+
+                // Rotate css positions array
+                let pos = POSITIONS.slice();
+                
+                for (let i=0; i<wind; i++)
+                    pos.push(pos.splice(0, 1)[0]);
+
+                // Remove all position from all elements
+                pos.forEach(e => {
+                    TON_ELEMENT.classList.remove(e);
+                    NAN_ELEMENT.classList.remove(e);
+                    SHAA_ELEMENT.classList.remove(e);
+                    PEI_ELEMENT.classList.remove(e);
+                });
+
+                // Apply them to each seat _ELEMENT
+                TON_ELEMENT.classList.add(pos[0]);
+                NAN_ELEMENT.classList.add(pos[1]);
+                SHAA_ELEMENT.classList.add(pos[2]);
+                PEI_ELEMENT.classList.add(pos[3]);
+
+                // Reset state (round and honba)
+                round = 1;
+                honba = 0;
+                // Call from nextRound should update display 
+            }
+
+            function nextRound() {
+                if (round === 4)                        // Check if next wind
+                    nextWind();
+                else {
+                    honba = 0;
+                    round++;                            // Increment counter
+                }
+
+                updateDisplay();
+            }
+
+            function nextHonba() {
+                honba++;                                // Increment counter
+                updateDisplay();
+            }
+
+            // Main
+            window.onload = () => {
+                nextWind();
+                updateDisplay();
+            }
+
+            ROUND_INFO.addEventListener("click", nextRound);
+            HONBA_DISPLAY.addEventListener("click", nextHonba);
+        </script>
+    </body>
+</html
