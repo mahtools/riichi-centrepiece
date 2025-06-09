@@ -28,7 +28,7 @@ You can head over to the [Github Pages](https://mahtools.github.io/riichi-centre
 Once opened it has no dependency on a stable internet connection to keep working.
 
 ### Use offline 🌐🚫
-The app is contained within a single html file. Download the file from the [master branch](https://github.com/mahtools/riichi-centrepiece/blob/master/index.html) or from the [releases tab](https://github.com/mahtools/riichi-centrepiece/releases/tag/1.0) and run it inside your preferred web browser.
+The app is contained within a single html file. Download the file from the [master branch](https://github.com/mahtools/riichi-centrepiece/blob/master/index.html) or from the [releases tab](https://github.com/mahtools/riichi-centrepiece/releases) and run it inside your preferred web browser.
 
 ### Controls
 The middle of the screen there is two strings of text. The top one is the *round tracker*, it shows you the current round wind and round number. The bottom one is the honba tracker, which shows you which repeat you are on.
