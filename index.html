@@ -148,7 +148,7 @@
             const HONBA_DISPLAY= document.getElementById("honbacount");
 
             // State
-            let round = 1;
+            let round = 0;          // AUto-flows to 1 at first nextRound()
             let wind = WIND_PEI;    // Auto-flows to TON at first nextWind()
             let honba = 0;
 
@@ -161,10 +161,18 @@
             function nextWind() {
                 wind = (wind + 1) % 4;      // Capping value between TON and PEI
 
+
+                // Reset state (round and honba)
+                round = 1;
+                honba = 0;
+                // Call from nextRound should update display 
+            }
+
+            function nextRound() {
                 // Rotate css positions array
                 let pos = POSITIONS.slice();
                 
-                for (let i=0; i<wind; i++)
+                for (let i=0; i<round; i++)
                     pos.push(pos.splice(0, 1)[0]);
 
                 // Remove all position from all elements
@@ -180,14 +188,8 @@
                 NAN_ELEMENT.classList.add(pos[1]);
                 SHAA_ELEMENT.classList.add(pos[2]);
                 PEI_ELEMENT.classList.add(pos[3]);
-
-                // Reset state (round and honba)
-                round = 1;
-                honba = 0;
-                // Call from nextRound should update display 
-            }
-
-            function nextRound() {
+                
+                // Increment counter
                 if (round === 4)                        // Check if next wind
                     nextWind();
                 else {
@@ -205,6 +207,7 @@
 
             // Main
             window.onload = () => {
+                nextRound();
                 nextWind();
                 updateDisplay();
             }
