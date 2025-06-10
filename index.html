@@ -1,7 +1,12 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <!-- Meta -->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Riichi Centrepiece</title>
+
+
 
         <!-- CSS -->
         <style>
@@ -24,7 +29,7 @@
             }
 
             * {
-                font-family: serif;
+                font-family: "Hiragino Mincho", "AoyagiKouzanFont2OTF", "EPSON 太行書体Ｂ", "Times New Roman", serif; 
                 font-size: 10vmin;
                 background-color: var(--bg);
                 color: var(--text);
@@ -176,7 +181,7 @@
             }
 
             #ton p {
-                color: var(--red); /* FIXME */
+                color: var(--red);
             }
 
             .option, .option span {
@@ -193,7 +198,7 @@
         </style>
     </head>
 
-    <body data-user-lang="en">
+    <body data-user-lang="jp">
         <!-- HTML -->
         <div class="container">
             <!-- Seats -->
@@ -231,7 +236,8 @@
                             <span lang="en">S</span>
                         </span>
                         <span id="shaaNakaDisplay" class="nakaDisplay">
-                            <span lang="en">S</span>
+                            <span lang="jp">西</span>
+                            <span lang="en">W</span>
                         </span>
                         <span id="peiNakaDisplay" class="nakaDisplay">
                             <span lang="jp">北</span>
@@ -266,7 +272,7 @@
         <script>
             // Constants
 
-            const WIND_TON        = 0;  // TODO: replace magic numbers in code with these constants
+            const WIND_TON        = 0;
             const WIND_NAN        = 1;
             const WIND_SHAA       = 2;
             const WIND_PEI        = 3;
@@ -314,7 +320,7 @@
             // State
 
             let darkMode = false;
-            let language = "en";
+            let language = "jp";
             let players = 4;
             let maxRounds = 2; 
 
@@ -359,7 +365,7 @@
                 NAN_ELEMENT.classList.add(pos[1]);
                 SHAA_ELEMENT.classList.add(pos[2]);
 
-                if (players === 4) {                // Only apply if 4 players are active
+                if (players === PLAYER_DEFAULT) {   // Only apply PEI if 4 players are active
                     PEI_ELEMENT.classList.add(pos[3]);
                     PEI_ELEMENT.classList.remove("hidden");
                 } else {                            // Otherwise hide the PEI seat
@@ -376,29 +382,38 @@
 
                 // Options
                 if (darkMode)           // Dark mode button
-                    DARKMODE_BTN.innerHTML = `L<span class="selected">D</span>`;
+                    DARKMODE_BTN.innerHTML = `&#9728;`;
                 else 
-                    DARKMODE_BTN.innerHTML = `<span class="selected">L</span>D`;
+                    DARKMODE_BTN.innerHTML = `&#9788;`;
 
 
                 if (isStart())          // Player count button
-                    if (players == 4)
+                    if (players == PLAYER_DEFAULT)
                         PLAYERC_BTN.innerHTML = `3<span class="selected">4</span>`; 
                     else 
                         PLAYERC_BTN.innerHTML = `<span class="selected">3</span>4`;
                 else 
-                    PLAYERC_BTN.innerHTML = "R";
+                    PLAYERC_BTN.innerHTML = `&#10227;`;
 
 
-                if (isStart())                      // Gametype button
-                    if (maxRounds === 1) 
-                        GAMET_BTN.innerHTML = `<span class="selected">東</span>半一`;
-                    else if (maxRounds === 2)
-                        GAMET_BTN.innerHTML = `東<span class="selected">半</span>一`;
+                if (isStart())          // Gametype button
+                    if (maxRounds === ROUND_TONPUUSEN) 
+                        GAMET_BTN.innerHTML = `
+                            <span lang="jp"><span class="selected">東</span>半一</span>
+                            <span lang="en"><span class="selected">T</span>HI</span>
+                            `;
+                    else if (maxRounds === ROUND_HANCHAN)
+                        GAMET_BTN.innerHTML = `
+                            <span lang="jp">東<span class="selected">半</span>一</span>
+                            <span lang="en">T<span class="selected">H</span>I</span>
+                        `;
                     else
-                        GAMET_BTN.innerHTML = `東半<span class="selected">一</span>`;
+                        GAMET_BTN.innerHTML = `
+                            <span lang="jp">東半<span class="selected">一</span></span>
+                            <span lang="en">TH<span class="selected">I</span></span>
+                        `;
                 else 
-                    GAMET_BTN.innerHTML = "R";
+                    GAMET_BTN.innerHTML = `&#10227;`;
             }
 
 
@@ -475,22 +490,22 @@
             
 
             function togglePlayerCount() {
-                if (players === 4) 
-                    players = 3;
+                if (players === PLAYER_DEFAULT) 
+                    players = PLAYER_SANMA;
                 else
-                    players = 4;
+                    players = PLAYER_DEFAULT;
 
                 updateDisplay();
             }
 
 
             function toggleGameType() {
-                if (maxRounds === 1)
-                    maxRounds = 2;
-                else if (maxRounds === 2)
-                    maxRounds = 4;
+                if (maxRounds === ROUND_TONPUUSEN)
+                    maxRounds = ROUND_HANCHAN;
+                else if (maxRounds === ROUND_HANCHAN)
+                    maxRounds = ROUND_IICHAN;
                 else
-                    maxRounds = 1;
+                    maxRounds = ROUND_TONPUUSEN;
 
                 updateDisplay();
             }
@@ -527,5 +542,9 @@
             }
 
         </script>
+        <noscript>  <!-- Hiding the entire page if no script is active -->
+            <style> body {display: none} </style>
+            <span style="display: initial !important;">Please enable JavaScript</span>
+        </noscript>
     </body>
 </html
