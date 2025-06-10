@@ -6,10 +6,30 @@
         <!-- CSS -->
         <style>
             /* Responsive font and global styles */
+            :root {
+                --red: #ff5555;
+                --green: #55dd55;
+                --blue: #5555ff;
+                --grey: #AAAAAA;
+
+                --text-dark: #e8e6e3;
+                --bg-dark: #181a1b;
+
+                --text-light: #000000;
+                --bg-light: #FFFFFF;
+
+                --text: var(--text-light);
+                --bg: var(--bg-light);
+
+            }
+
             * {
                 font-family: serif;
                 font-size: 10vmin;
+                background-color: var(--bg);
+                color: var(--text);
             }
+
 
             html, body {
                 height: 100%;
@@ -30,6 +50,13 @@
                 -ms-user-select: none; /* IE 10 and IE 11 */
                 user-select: none; /* Standard syntax */
             }
+
+            /* Multi-language support */
+            [data-user-lang=en] [lang]:not([lang=en]),
+            [data-user-lang=jp] [lang]:not([lang=jp]) {
+                display: none;
+            }
+
 
             /* Layout information */
             .container {
@@ -82,12 +109,19 @@
             .seat {
                 justify-self: center;
                 align-self: center;
+                width: 20vmin;
+                height: 20vmin;
             }
 
             .seat p {
                 font-weight: bold;
                 font-size: 20vmin;
                 margin: 0;
+                text-align: center;
+            }
+
+            .hidden {
+                visibility: hidden;
             }
 
             #naka {
@@ -96,9 +130,44 @@
                 text-align: center;
             }
 
+            #tonNakaDisplay {
+                display: none;
+            }
+
+            #nanNakaDisplay {
+                display: none;
+            }
+
+            #shaaNakaDisplay {
+                display: none;
+            }
+
+            #peiNakaDisplay {
+                display: none;
+            }
+
             #roundinfo {
                 margin: 0;
                 font-weight: bold;
+                font-size: 0;
+            }
+
+            .nakaDisplay {
+                font-size: 0;
+            }
+
+            .nakaDisplay span {
+                font-size: 10vmin;
+                color: var(--blue);
+            }
+
+            #honbainfo {
+                margin: 0;
+                font-size: 0;
+            }
+
+            #honbainfo span {
+                font-size: 8vmin;
             }
 
             #honbacount {
@@ -106,56 +175,87 @@
                 font-size: 8vmin;
             }
 
-            /* Color info */
-            #roundwind {
-                color: #00A;
+            #ton p {
+                color: var(--red); /* FIXME */
             }
 
-            #ton {
-                color: #A00;
-            }
+            .option, .option span {
+                color: var(--grey);
 
-            .option {
                 border-width: 0;
-                background: #FFF;
-                color: #AAA;
+                font-size: 6vmin;
+            }
+
+            .selected {
+                color: var(--green) !important; /* FIXME */
+                font-weight: bold !important; /* FIXME */
             }
         </style>
     </head>
 
-    <body>
+    <body data-user-lang="en">
         <!-- HTML -->
         <div class="container">
             <!-- Seats -->
             <div id="ton" class="seat">
-                <p class="seatwind">東</p>
+                <p class="seatwind" lang="jp">東</p>
+                <p class="seatwind" lang="en">E</p>
             </div>
 
             <div id="nan" class="seat">
-                <p class="seatwind">南</p>
+                <p class="seatwind" lang="jp">南</p>
+                <p class="seatwind" lang="en">S</p>
             </div>
 
             <div id="shaa" class="seat">
-                <p class="seatwind">西</p>
+                <p class="seatwind" lang="jp">西</p>
+                <p class="seatwind" lang="en">W</p>
             </div>
 
             <div id="pei" class="seat">
-                <p class="seatwind">北</p>
+                <p class="seatwind" lang="jp">北</p>
+                <p class="seatwind" lang="en">N</p>
             </div>
 
 
             <!-- Information -->
             <div id="naka">
                 <p id="roundinfo">
-                    <span id="roundwind"></span><span id="roundcount"></span>
+                    <span id="roundwind">
+                        <span id="tonNakaDisplay" class="nakaDisplay">
+                            <span lang="jp">東</span>
+                            <span lang="en">E</span>
+                        </span>
+                        <span id="nanNakaDisplay" class="nakaDisplay">
+                            <span lang="jp">南</span>
+                            <span lang="en">S</span>
+                        </span>
+                        <span id="shaaNakaDisplay" class="nakaDisplay">
+                            <span lang="en">S</span>
+                        </span>
+                        <span id="peiNakaDisplay" class="nakaDisplay">
+                            <span lang="jp">北</span>
+                            <span lang="en">N</span>
+                        </span>
+                    </span>
+                    <span id="roundcount"></span>
+
+                    <span lang="jp">局</span>
+                    <span lang="en"></span>
                 </p>
-                <p id="honbacount"></p>
+
+                <p id="honbainfo"> 
+                    <span id="honbacount"></span>
+                    <span lang="jp">本場</span>
+                    <span lang="en">H</span>
+                </p>
+                
             </div>
 
             <!-- Options -->
             <button id="darkmode" class="option"></button>
 
-            <button id="languageswitch" class="option"></button>
+            <button id="languageswitch" class="option">Aあ</button>
 
             <button id="playercount" class="option"></button>
 
@@ -166,26 +266,45 @@
         <script>
             // Constants
 
-            const WIND_TON        = 0;  // TODO: look into replacing this with an enum
+            const WIND_TON        = 0;  // TODO: replace magic numbers in code with these constants
             const WIND_NAN        = 1;
             const WIND_SHAA       = 2;
             const WIND_PEI        = 3;
-            const WINDS           = ["東", "南", "西", "北"]; // TODO: replace with a language-switcher friendly version
+
             const POSITIONS       = ["bottom", "right", "top", "left"];   // CSS classes
+
             const PLAYER_DEFAULT  = 4;
             const PLAYER_SANMA    = 3;
+
             const ROUND_TONPUUSEN = 1;
             const ROUND_HANCHAN   = 2;
             const ROUND_IICHAN    = 4;
+
+
+            // Element constants
 
             const TON_ELEMENT     = document.getElementById("ton");
             const NAN_ELEMENT     = document.getElementById("nan");
             const SHAA_ELEMENT    = document.getElementById("shaa");
             const PEI_ELEMENT     = document.getElementById("pei");
+
+            const TON_NAKA        = document.getElementById("tonNakaDisplay");
+            const NAN_NAKA        = document.getElementById("nanNakaDisplay");
+            const SHAA_NAKA       = document.getElementById("shaaNakaDisplay");
+            const PEI_NAKA        = document.getElementById("peiNakaDisplay");
+
+            const WINDS           = [TON_NAKA, NAN_NAKA, SHAA_NAKA, PEI_NAKA];
+
             const WIND_DISPLAY    = document.getElementById("roundwind");
+
             const ROUND_INFO      = document.getElementById("roundinfo");
             const ROUND_DISPLAY   = document.getElementById("roundcount");
+
+            const HONBA_INFO      = document.getElementById("honbainfo");
             const HONBA_DISPLAY   = document.getElementById("honbacount");
+
+            const LANGUAGES       = ["jp", "en"];
+
             const DARKMODE_BTN    = document.getElementById("darkmode");
             const LANGUAGE_BTN    = document.getElementById("languageswitch");
             const PLAYERC_BTN     = document.getElementById("playercount");
@@ -195,24 +314,24 @@
             // State
 
             let darkMode = false;
-            let language = "en";    // TODO: should default be JP?
+            let language = "en";
             let players = 4;
-            let maxRounds = 2;      // Hanchan by default
+            let maxRounds = 2; 
 
-            let round = 0;          // Auto-flows to 1 at first nextRound()     TODO: addition of a reset() will remove this 
-            let wind = WIND_PEI;    // Auto-flows to TON at first nextWind()    TODO: addition of a reset() will remove this
+            let round = 1;
+            let wind = WIND_TON;
             let honba = 0;
 
 
             // Utility functions
 
             function isStart() {
-                return round === 0 && wind === WIND_TON && honba === 0;
+                return round === 1 && wind === WIND_TON && honba === 0;
             }
 
             function reset() {
-                round = 0;
-                wind = WIND_PEI;
+                round = 1;
+                wind = WIND_TON;
                 honba = 0;
 
                 updateDisplay();
@@ -222,41 +341,106 @@
             // Display functions
 
             function updateDisplay() {
-                // Naka 
-                WIND_DISPLAY.innerText  = `${WINDS[wind]}`;     // TODO: replace WINDS with a language-switch friendly alternative
-                ROUND_DISPLAY.innerText = `${round}局`;         // TODO: replace kyoku with a language-switch friendly alternative
-                HONBA_DISPLAY.innerText = `${honba}本場`;       // TODO: replace honba with a language-switch friendly alternative
+                // Seat positions
+                let pos = POSITIONS.slice();        // Rotating a copy
+                pos = pos.splice(0, players);       // Filter out by amount of players
+                
+                for (let i=0; i<round-1; i++)
+                    pos.push(pos.splice(0, 1)[0]);
 
-                // Options                                      // TODO: replace all of these options with a language-switch friendly alternative
+                pos.forEach(e => {                  // Remove all position from all elements
+                    TON_ELEMENT.classList.remove(e);
+                    NAN_ELEMENT.classList.remove(e);
+                    SHAA_ELEMENT.classList.remove(e);
+                    PEI_ELEMENT.classList.remove(e);
+                });
+                
+                TON_ELEMENT.classList.add(pos[0]);  // Apply them to each seat _ELEMENT
+                NAN_ELEMENT.classList.add(pos[1]);
+                SHAA_ELEMENT.classList.add(pos[2]);
+
+                if (players === 4) {                // Only apply if 4 players are active
+                    PEI_ELEMENT.classList.add(pos[3]);
+                    PEI_ELEMENT.classList.remove("hidden");
+                } else {                            // Otherwise hide the PEI seat
+                    PEI_ELEMENT.classList.add("hidden");
+                }
+                
+
+                // Naka 
+                WINDS.forEach(e => e.style.display = "none");
+                WINDS[wind].style.display = "initial";
+                ROUND_DISPLAY.innerText = `${round}`;
+                HONBA_DISPLAY.innerText = `${honba}`;
+
+
+                // Options
                 if (darkMode)           // Dark mode button
-                    DARKMODE_BTN.innerHtml = `L/<span style="color:#FAF">D</span>`;
+                    DARKMODE_BTN.innerHTML = `L<span class="selected">D</span>`;
                 else 
-                    DARKMODE_BTN.innerHtml = `<span style="color:#FAF">L</span>/D`;
+                    DARKMODE_BTN.innerHTML = `<span class="selected">L</span>D`;
 
 
                 if (isStart())          // Player count button
                     if (players == 4)
-                        PLAYERC_BTN.innerHtml = `3/<span style="color:#FAF">4</span>`; 
+                        PLAYERC_BTN.innerHTML = `3<span class="selected">4</span>`; 
                     else 
-                        PLAYERC_BTN.innerHtml = `<span style="color:#FAF">3</span>/4`;
+                        PLAYERC_BTN.innerHTML = `<span class="selected">3</span>4`;
                 else 
-                    PLAYERC_BTN.innerHtml = "R";
+                    PLAYERC_BTN.innerHTML = "R";
 
 
-                if (isStart())          // Player count button
-                    if (maxRounds === 1)    // Gametype button
-                        GAMET_BTN.innerHtml = `<span style="color:#FAF">東</span>/半/一`
+                if (isStart())                      // Gametype button
+                    if (maxRounds === 1) 
+                        GAMET_BTN.innerHTML = `<span class="selected">東</span>半一`;
                     else if (maxRounds === 2)
-                        GAMET_BTN.innerHtml = `東/<span style="color:#FAF">半</span>/一`
+                        GAMET_BTN.innerHTML = `東<span class="selected">半</span>一`;
                     else
-                        GAMET_BTN.innerHtml = `東/半/<span style="color:#FAF">一</span>`
+                        GAMET_BTN.innerHTML = `東半<span class="selected">一</span>`;
                 else 
-                    PLAYERC_BTN.innerHtml = "R";
+                    GAMET_BTN.innerHTML = "R";
             }
+
 
             function toggleDarkMode() {
-                // TODO
+                darkMode = !darkMode;               // Toggle bool
+
+                // Change CSS variables
+                const root = document.querySelector(":root");
+                const style = root.style;
+                const comp_style = window.getComputedStyle(root);
+
+                let new_bg;
+                let new_text;
+
+                if (darkMode) { 
+                    new_bg = comp_style.getPropertyValue("--bg-dark");
+                    new_text = comp_style.getPropertyValue("--text-dark");
+                } else {
+                    new_bg = comp_style.getPropertyValue("--bg-light");
+                    new_text = comp_style.getPropertyValue("--text-light");
+                }
+
+                console.log(new_bg);
+                console.log(new_text);
+
+                style.setProperty("--bg", new_bg);
+                style.setProperty("--text", new_text);
+
+
+                // Refresh screen
+                updateDisplay();
             }
+
+
+            function toggleLanguage() {
+                const i = LANGUAGES.indexOf(language);
+                const next_lang = LANGUAGES[(i+1) % LANGUAGES.length];
+
+                language = next_lang;
+                document.body.setAttribute("data-user-lang", language);
+            }
+
 
 
             // Round control functions
@@ -273,28 +457,7 @@
 
 
             function nextRound() {
-                // Rotate css positions array
-                let pos = POSITIONS.slice();            // Rotating a copy
-                
-                for (let i=0; i<round; i++)
-                    pos.push(pos.splice(0, 1)[0]);
-
-                // Remove all position from all elements
-                pos.forEach(e => {
-                    TON_ELEMENT.classList.remove(e);
-                    NAN_ELEMENT.classList.remove(e);
-                    SHAA_ELEMENT.classList.remove(e);
-                    PEI_ELEMENT.classList.remove(e);
-                });
-
-                // Apply them to each seat _ELEMENT
-                TON_ELEMENT.classList.add(pos[0]);
-                NAN_ELEMENT.classList.add(pos[1]);
-                SHAA_ELEMENT.classList.add(pos[2]);
-                PEI_ELEMENT.classList.add(pos[3]);
-                
-                // Increment counter
-                if (round === 4)                        // Check if next wind
+                if (round === players)                  // Check if next wind
                     nextWind();
                 else {
                     honba = 0;
@@ -309,6 +472,28 @@
                 honba++;                                // Increment counter
                 updateDisplay();
             }
+            
+
+            function togglePlayerCount() {
+                if (players === 4) 
+                    players = 3;
+                else
+                    players = 4;
+
+                updateDisplay();
+            }
+
+
+            function toggleGameType() {
+                if (maxRounds === 1)
+                    maxRounds = 2;
+                else if (maxRounds === 2)
+                    maxRounds = 4;
+                else
+                    maxRounds = 1;
+
+                updateDisplay();
+            }
 
 
 
@@ -316,18 +501,29 @@
 
             window.onload = () => {
                 // Cycling into correct information
-                nextRound();                            // TODO: Replace with a reset() command
-                nextWind();                             // TODO: see above
+                reset();
                 updateDisplay();
 
                 // Bindings
                 ROUND_INFO.addEventListener("click", nextRound);
-                HONBA_DISPLAY.addEventListener("click", nextHonba);
+                HONBA_INFO.addEventListener("click", nextHonba);
 
-                DARKMODE_BTN.addEventListener("click", nextHonba); // TODO
-                LANGUAGE_BTN.addEventListener("click", nextHonba);
-                PLAYERC_BTN.addEventListener("click", nextHonba);
-                GAMET_BTN.addEventListener("click", nextHonba);
+                DARKMODE_BTN.addEventListener("click", toggleDarkMode);
+                LANGUAGE_BTN.addEventListener("click", toggleLanguage);
+
+                PLAYERC_BTN.addEventListener("click", () => {
+                    if (isStart())
+                        togglePlayerCount();
+                    else
+                        reset();
+                });
+
+                GAMET_BTN.addEventListener("click", () => {
+                    if (isStart())
+                        toggleGameType();
+                    else
+                        reset();
+                });
             }
 
         </script>
