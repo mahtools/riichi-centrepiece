@@ -236,16 +236,25 @@
 
             // Main
             window.onload = () => {
+                // Setting up state
                 nextRound();
                 nextWind();
                 updateDisplay();
 
+                // Reclaiming wake lock
+                document.addEventListener("visibilitychange", async () => {
+                    if (wakeLock !== null && document.visibilityState === "visible")
+                        noSleep();
+                });
+
+                // Setting up wake lock
                 if ("wakeLock" in navigator) {
                     noSleep();          // Starts async loop
                 } else {
                     console.log(`wakeLock does not exist, wakeLock will not be called.`);
                 }
 
+                // Bindings
                 ROUND_INFO.addEventListener("click", nextRound);
                 HONBA_DISPLAY.addEventListener("click", nextHonba);
 
