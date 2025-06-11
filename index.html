@@ -205,11 +205,26 @@
                 updateDisplay();
             }
 
+
+            // Mobile features
+            async function noSleep() {
+                const wakeLock = await navigator.wakeLock.request("screen");
+
+                // If we are no longer allowed to block sleep, attempt reblock
+                wakeLock.addEventListener("release", () => {
+                    noSleep();
+                });
+            }
+
+
             // Main
             window.onload = () => {
                 nextRound();
                 nextWind();
                 updateDisplay();
+
+                if (navigator.wakeLock)
+                    noSleep();          // Starts async loop
             }
 
             ROUND_INFO.addEventListener("click", nextRound);
