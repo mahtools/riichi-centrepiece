@@ -234,8 +234,15 @@
                 nextWind();
                 updateDisplay();
 
-                if (navigator.wakeLock)
-                    noSleep();          // Starts async loop
+                if (navigator.wakeLock) {
+                    try {
+                        noSleep();          // Starts async loop
+                    } catch (err) {
+                        console.log(`Caught ${err}, wakeLock will not be called.`);
+                    }
+                } else {
+                    console.log(`wakeLock does not exist, wakeLock will not be called.`);
+                }
             }
 
             ROUND_INFO.addEventListener("click", nextRound);
