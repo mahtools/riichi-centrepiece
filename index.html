@@ -152,6 +152,8 @@
             let wind = WIND_PEI;    // Auto-flows to TON at first nextWind()
             let honba = 0;
 
+            let wakeLock = null;    // Used for UI locking in window.onload
+
             function updateDisplay() {
                 WIND_DISPLAY.innerText  = `${WINDS[wind]}`;
                 ROUND_DISPLAY.innerText = `${round}局`;
@@ -210,12 +212,16 @@
             // Mobile features
 
             async function noSleep() {
-                const wakeLock = await navigator.wakeLock.request("screen");
+                try {
+                    wakeLock = await navigator.wakeLock.request("screen");
 
-                // If we are no longer allowed to block sleep, attempt reblock
-                wakeLock.addEventListener("release", () => {
-                    noSleep();
-                });
+                    // Attempt reblock if wakeLock is released
+                    wakeLock.addEventListener("release", () => {
+                        noSleep();
+                    });
+                } catch (err) {
+                    console.log(`Caught ${err.name}, wakeLock will not be called. (${err.message})`);
+                }
             }
 
 
@@ -234,24 +240,20 @@
                 nextWind();
                 updateDisplay();
 
-                if (navigator.wakeLock) {
-                    try {
-                        noSleep();          // Starts async loop
-                    } catch (err) {
-                        console.log(`Caught ${err}, wakeLock will not be called.`);
-                    }
+                if ("wakeLock" in navigator) {
+                    noSleep();          // Starts async loop
                 } else {
                     console.log(`wakeLock does not exist, wakeLock will not be called.`);
                 }
+
+                ROUND_INFO.addEventListener("click", nextRound);
+                HONBA_DISPLAY.addEventListener("click", nextHonba);
+
+                TON_ELEMENT.addEventListener("dblclick", toggleFullscreen);
+                NAN_ELEMENT.addEventListener("dblclick", toggleFullscreen);
+                SHAA_ELEMENT.addEventListener("dblclick", toggleFullscreen);
+                PEI_ELEMENT.addEventListener("dblclick", toggleFullscreen);
             }
-
-            ROUND_INFO.addEventListener("click", nextRound);
-            HONBA_DISPLAY.addEventListener("click", nextHonba);
-
-            TON_ELEMENT.addEventListener("dblclick", toggleFullscreen);
-            NAN_ELEMENT.addEventListener("dblclick", toggleFullscreen);
-            SHAA_ELEMENT.addEventListener("dblclick", toggleFullscreen);
-            PEI_ELEMENT.addEventListener("dblclick", toggleFullscreen);
         </script>
     </body>
 </html
