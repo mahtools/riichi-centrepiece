@@ -206,7 +206,9 @@
             }
 
 
+
             // Mobile features
+
             async function noSleep() {
                 const wakeLock = await navigator.wakeLock.request("screen");
 
@@ -215,6 +217,15 @@
                     noSleep();
                 });
             }
+
+
+            function toggleFullscreen() {
+                if (document.fullscreenElement === null)
+                    document.documentElement.requestFullscreen();
+                else
+                    document.exitFullscreen();
+            }
+
 
 
             // Main
@@ -229,6 +240,11 @@
 
             ROUND_INFO.addEventListener("click", nextRound);
             HONBA_DISPLAY.addEventListener("click", nextHonba);
+
+            TON_ELEMENT.addEventListener("dblclick", toggleFullscreen);
+            NAN_ELEMENT.addEventListener("dblclick", toggleFullscreen);
+            SHAA_ELEMENT.addEventListener("dblclick", toggleFullscreen);
+            PEI_ELEMENT.addEventListener("dblclick", toggleFullscreen);
         </script>
     </body>
 </html
