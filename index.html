@@ -152,6 +152,8 @@
             let wind = WIND_PEI;    // Auto-flows to TON at first nextWind()
             let honba = 0;
 
+            let wakeLock = null;    // Used for UI locking in window.onload
+
             function updateDisplay() {
                 WIND_DISPLAY.innerText  = `${WINDS[wind]}`;
                 ROUND_DISPLAY.innerText = `${round}局`;
@@ -205,15 +207,62 @@
                 updateDisplay();
             }
 
+
+
+            // Mobile features
+
+            async function noSleep() {
+                try {
+                    wakeLock = await navigator.wakeLock.request("screen");
+
+                    // Attempt reblock if wakeLock is released
+                    wakeLock.addEventListener("release", () => {
+                        noSleep();
+                    });
+                } catch (err) {
+                    console.log(`Caught ${err.name}, wakeLock will not be called. (${err.message})`);
+                }
+            }
+
+
+            function toggleFullscreen() {
+                if (document.fullscreenElement === null)
+                    document.documentElement.requestFullscreen();
+                else
+                    document.exitFullscreen();
+            }
+
+
+
             // Main
             window.onload = () => {
+                // Setting up state
                 nextRound();
                 nextWind();
                 updateDisplay();
-            }
 
-            ROUND_INFO.addEventListener("click", nextRound);
-            HONBA_DISPLAY.addEventListener("click", nextHonba);
+                // Reclaiming wake lock
+                document.addEventListener("visibilitychange", async () => {
+                    if (wakeLock !== null && document.visibilityState === "visible")
+                        noSleep();
+                });
+
+                // Setting up wake lock
+                if ("wakeLock" in navigator) {
+                    noSleep();          // Starts async loop
+                } else {
+                    console.log(`wakeLock does not exist, wakeLock will not be called.`);
+                }
+
+                // Bindings
+                ROUND_INFO.addEventListener("click", nextRound);
+                HONBA_DISPLAY.addEventListener("click", nextHonba);
+
+                TON_ELEMENT.addEventListener("dblclick", toggleFullscreen);
+                NAN_ELEMENT.addEventListener("dblclick", toggleFullscreen);
+                SHAA_ELEMENT.addEventListener("dblclick", toggleFullscreen);
+                PEI_ELEMENT.addEventListener("dblclick", toggleFullscreen);
+            }
         </script>
     </body>
 </html
