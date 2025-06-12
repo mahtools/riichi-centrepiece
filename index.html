@@ -55,7 +55,7 @@
                 -ms-user-select: none; /* IE 10 and IE 11 */
                 user-select: none; /* Standard syntax */
             }
-
+            
             /* Multi-language support */
             [data-user-lang=en] [lang]:not([lang=en]),
             [data-user-lang=jp] [lang]:not([lang=jp]) {
@@ -184,7 +184,7 @@
                 color: var(--red);
             }
 
-            .option, .option span {
+            .option, .option span, .option path {
                 color: var(--grey);
 
                 border-width: 0;
@@ -261,7 +261,11 @@
             <!-- Options -->
             <button id="darkmode" class="option"></button>
 
-            <button id="languageswitch" class="option">Aあ</button>
+            <button id="languageswitch" class="option">
+                <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-globe" viewBox="0 0 16 16">
+                    <path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m7.5-6.923c-.67.204-1.335.82-1.887 1.855A8 8 0 0 0 5.145 4H7.5zM4.09 4a9.3 9.3 0 0 1 .64-1.539 7 7 0 0 1 .597-.933A7.03 7.03 0 0 0 2.255 4zm-.582 3.5c.03-.877.138-1.718.312-2.5H1.674a7 7 0 0 0-.656 2.5zM4.847 5a12.5 12.5 0 0 0-.338 2.5H7.5V5zM8.5 5v2.5h2.99a12.5 12.5 0 0 0-.337-2.5zM4.51 8.5a12.5 12.5 0 0 0 .337 2.5H7.5V8.5zm3.99 0V11h2.653c.187-.765.306-1.608.338-2.5zM5.145 12q.208.58.468 1.068c.552 1.035 1.218 1.65 1.887 1.855V12zm.182 2.472a7 7 0 0 1-.597-.933A9.3 9.3 0 0 1 4.09 12H2.255a7 7 0 0 0 3.072 2.472M3.82 11a13.7 13.7 0 0 1-.312-2.5h-2.49c.062.89.291 1.733.656 2.5zm6.853 3.472A7 7 0 0 0 13.745 12H11.91a9.3 9.3 0 0 1-.64 1.539 7 7 0 0 1-.597.933M8.5 12v2.923c.67-.204 1.335-.82 1.887-1.855q.26-.487.468-1.068zm3.68-1h2.146c.365-.767.594-1.61.656-2.5h-2.49a13.7 13.7 0 0 1-.312 2.5m2.802-3.5a7 7 0 0 0-.656-2.5H12.18c.174.782.282 1.623.312 2.5zM11.27 2.461c.247.464.462.98.64 1.539h1.835a7 7 0 0 0-3.072-2.472c.218.284.418.598.597.933M10.855 4a8 8 0 0 0-.468-1.068C9.835 1.897 9.17 1.282 8.5 1.077V4z"/>
+                </svg>
+            </button>
 
             <button id="playercount" class="option"></button>
 
@@ -289,32 +293,32 @@
 
             // Element constants
 
-            const TON_ELEMENT     = document.getElementById("ton");
-            const NAN_ELEMENT     = document.getElementById("nan");
-            const SHAA_ELEMENT    = document.getElementById("shaa");
-            const PEI_ELEMENT     = document.getElementById("pei");
+            const ELEMENT_TON     = document.getElementById("ton");
+            const ELEMENT_NAN     = document.getElementById("nan");
+            const ELEMENT_SHAA    = document.getElementById("shaa");
+            const ELEMENT_PEI     = document.getElementById("pei");
 
-            const TON_NAKA        = document.getElementById("tonNakaDisplay");
-            const NAN_NAKA        = document.getElementById("nanNakaDisplay");
-            const SHAA_NAKA       = document.getElementById("shaaNakaDisplay");
-            const PEI_NAKA        = document.getElementById("peiNakaDisplay");
+            const NAKA_TON        = document.getElementById("tonNakaDisplay");
+            const NAKA_NAN        = document.getElementById("nanNakaDisplay");
+            const NAKA_SHAA       = document.getElementById("shaaNakaDisplay");
+            const NAKA_PEI        = document.getElementById("peiNakaDisplay");
 
-            const WINDS           = [TON_NAKA, NAN_NAKA, SHAA_NAKA, PEI_NAKA];
+            const WINDS           = [NAKA_TON, NAKA_NAN, NAKA_SHAA, NAKA_PEI];
 
             const WIND_DISPLAY    = document.getElementById("roundwind");
 
-            const ROUND_INFO      = document.getElementById("roundinfo");
-            const ROUND_DISPLAY   = document.getElementById("roundcount");
+            const INFO_ROUND      = document.getElementById("roundinfo");
+            const DISPLAY_ROUND   = document.getElementById("roundcount");
 
-            const HONBA_INFO      = document.getElementById("honbainfo");
-            const HONBA_DISPLAY   = document.getElementById("honbacount");
+            const INFO_HONBA      = document.getElementById("honbainfo");
+            const DISPLAY_HONBA   = document.getElementById("honbacount");
 
             const LANGUAGES       = ["jp", "en"];
 
-            const DARKMODE_BTN    = document.getElementById("darkmode");
-            const LANGUAGE_BTN    = document.getElementById("languageswitch");
-            const PLAYERC_BTN     = document.getElementById("playercount");
-            const GAMET_BTN       = document.getElementById("gametype");
+            const BTN_DARKMODE    = document.getElementById("darkmode");
+            const BTN_LANGUAGE    = document.getElementById("languageswitch");
+            const BTN_PLAYERC     = document.getElementById("playercount");
+            const BTN_GAMET       = document.getElementById("gametype");
 
 
             // State
@@ -355,65 +359,65 @@
                     pos.push(pos.splice(0, 1)[0]);
 
                 pos.forEach(e => {                  // Remove all position from all elements
-                    TON_ELEMENT.classList.remove(e);
-                    NAN_ELEMENT.classList.remove(e);
-                    SHAA_ELEMENT.classList.remove(e);
-                    PEI_ELEMENT.classList.remove(e);
+                    ELEMENT_TON.classList.remove(e);
+                    ELEMENT_NAN.classList.remove(e);
+                    ELEMENT_SHAA.classList.remove(e);
+                    ELEMENT_PEI.classList.remove(e);
                 });
                 
-                TON_ELEMENT.classList.add(pos[0]);  // Apply them to each seat _ELEMENT
-                NAN_ELEMENT.classList.add(pos[1]);
-                SHAA_ELEMENT.classList.add(pos[2]);
+                ELEMENT_TON.classList.add(pos[0]);  // Apply them to each seat _ELEMENT
+                ELEMENT_NAN.classList.add(pos[1]);
+                ELEMENT_SHAA.classList.add(pos[2]);
 
                 if (players === PLAYER_DEFAULT) {   // Only apply PEI if 4 players are active
-                    PEI_ELEMENT.classList.add(pos[3]);
-                    PEI_ELEMENT.classList.remove("hidden");
+                    ELEMENT_PEI.classList.add(pos[3]);
+                    ELEMENT_PEI.classList.remove("hidden");
                 } else {                            // Otherwise hide the PEI seat
-                    PEI_ELEMENT.classList.add("hidden");
+                    ELEMENT_PEI.classList.add("hidden");
                 }
                 
 
                 // Naka 
                 WINDS.forEach(e => e.style.display = "none");
                 WINDS[wind].style.display = "initial";
-                ROUND_DISPLAY.innerText = `${round}`;
-                HONBA_DISPLAY.innerText = `${honba}`;
+                DISPLAY_ROUND.innerText = `${round}`;
+                DISPLAY_HONBA.innerText = `${honba}`;
 
 
                 // Options
                 if (darkMode)           // Dark mode button
-                    DARKMODE_BTN.innerHTML = `&#9728;`;
+                    BTN_DARKMODE.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-sun" viewBox="0 0 16 16"><path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6m0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/></svg>`;
                 else 
-                    DARKMODE_BTN.innerHTML = `&#9788;`;
+                    BTN_DARKMODE.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-moon-fill" viewBox="0 0 16 16"><path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"/></svg>`;
 
 
                 if (isStart())          // Player count button
                     if (players == PLAYER_DEFAULT)
-                        PLAYERC_BTN.innerHTML = `3<span class="selected">4</span>`; 
+                        BTN_PLAYERC.innerHTML = `3<span class="selected">4</span>`; 
                     else 
-                        PLAYERC_BTN.innerHTML = `<span class="selected">3</span>4`;
+                        BTN_PLAYERC.innerHTML = `<span class="selected">3</span>4`;
                 else 
-                    PLAYERC_BTN.innerHTML = `&#10227;`;
+                    BTN_PLAYERC.innerHTML = `&#10227;`;
 
 
                 if (isStart())          // Gametype button
                     if (maxRounds === ROUND_TONPUUSEN) 
-                        GAMET_BTN.innerHTML = `
+                        BTN_GAMET.innerHTML = `
                             <span lang="jp"><span class="selected">東</span>半一</span>
                             <span lang="en"><span class="selected">T</span>HI</span>
                             `;
                     else if (maxRounds === ROUND_HANCHAN)
-                        GAMET_BTN.innerHTML = `
+                        BTN_GAMET.innerHTML = `
                             <span lang="jp">東<span class="selected">半</span>一</span>
                             <span lang="en">T<span class="selected">H</span>I</span>
                         `;
                     else
-                        GAMET_BTN.innerHTML = `
+                        BTN_GAMET.innerHTML = `
                             <span lang="jp">東半<span class="selected">一</span></span>
                             <span lang="en">TH<span class="selected">I</span></span>
                         `;
                 else 
-                    GAMET_BTN.innerHTML = `&#10227;`;
+                    BTN_GAMET.innerHTML = `&#10227;`;
             }
 
 
@@ -517,20 +521,20 @@
                 updateDisplay();
 
                 // Bindings
-                ROUND_INFO.addEventListener("click", nextRound);
-                HONBA_INFO.addEventListener("click", nextHonba);
+                INFO_ROUND.addEventListener("click", nextRound);
+                INFO_HONBA.addEventListener("click", nextHonba);
 
-                DARKMODE_BTN.addEventListener("click", toggleDarkMode);
-                LANGUAGE_BTN.addEventListener("click", toggleLanguage);
+                BTN_DARKMODE.addEventListener("click", toggleDarkMode);
+                BTN_LANGUAGE.addEventListener("click", toggleLanguage);
 
-                PLAYERC_BTN.addEventListener("click", () => {
+                BTN_PLAYERC.addEventListener("click", () => {
                     if (isStart())
                         togglePlayerCount();
                     else
                         reset();
                 });
 
-                GAMET_BTN.addEventListener("click", () => {
+                BTN_GAMET.addEventListener("click", () => {
                     if (isStart())
                         toggleGameType();
                     else
