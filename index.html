@@ -327,11 +327,13 @@
             let language = "jp";
             let players = 4;
             let maxRounds = 2; 
+            let wakeLock = null;    // Used for UI locking in window.onload
 
             let round = 1;
             let wind = WIND_TON;
             let honba = 0;
-
+          
+          
 
             // Utility functions
 
@@ -513,16 +515,61 @@
 
 
 
+
+
+            // Mobile features
+
+            async function noSleep() {
+                try {
+                    wakeLock = await navigator.wakeLock.request("screen");
+
+                    // Attempt reblock if wakeLock is released
+                    wakeLock.addEventListener("release", () => {
+                        noSleep();
+                    });
+                } catch (err) {
+                    console.log(`Caught ${err.name}, wakeLock will not be called. (${err.message})`);
+                }
+            }
+
+
+            function toggleFullscreen() {
+                if (document.fullscreenElement === null)
+                    document.documentElement.requestFullscreen();
+                else
+                    document.exitFullscreen();
+            }
+
+
+
             // Main
 
             window.onload = () => {
-                // Cycling into correct information
+                // Resetting state and updating display for the first time
                 reset();
                 updateDisplay();
+              
+                // Reclaiming wake lock
+                document.addEventListener("visibilitychange", async () => {
+                    if (wakeLock !== null && document.visibilityState === "visible")
+                        noSleep();
+                });
+
+                // Setting up wake lock
+                if ("wakeLock" in navigator) {
+                    noSleep();          // Starts async loop
+                } else {
+                    console.log(`wakeLock does not exist, wakeLock will not be called.`);
+                }
 
                 // Bindings
                 INFO_ROUND.addEventListener("click", nextRound);
-                INFO_HONBA.addEventListener("click", nextHonba);
+                DISPLAY_HONBA.addEventListener("click", nextHonba);
+
+                ELEMENT_TON.addEventListener("dblclick", toggleFullscreen);
+                ELEMENT_NAN.addEventListener("dblclick", toggleFullscreen);
+                ELEMENT_SHAA.addEventListener("dblclick", toggleFullscreen);
+                ELEMENT_PEI.addEventListener("dblclick", toggleFullscreen);
 
                 BTN_DARKMODE.addEventListener("click", toggleDarkMode);
                 BTN_LANGUAGE.addEventListener("click", toggleLanguage);
@@ -541,11 +588,10 @@
                         reset();
                 });
             }
-
         </script>
         <noscript>  <!-- Hiding the entire page if no script is active -->
             <style> .container {display: none} </style>
             <span>Please enable JavaScript</span>
         </noscript>
     </body>
-</html
+</html>
